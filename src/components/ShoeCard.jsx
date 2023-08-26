@@ -4,7 +4,6 @@ const ShoeCard = ({ imgURL, changeBigShoeImage, bigShoeImg }) => {
       changeBigShoeImage(imgURL.bigShoe);
     }
   };
-
   return (
     <div
       className={`border-2 rounded-xl ${
