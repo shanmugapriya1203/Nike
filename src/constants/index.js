@@ -91,8 +91,8 @@ export const reviews = [
     {
         imgURL:image3,
         customerName:'Sam arich',
-        rating:4,
-        feedback:'Its nice and comfortable'
+        rating:4.2,
+        feedback:'The Nike Terra Kiger 9 received a complete makeover from versions 7 and 8. But while looks may be different; function and purpose remain the same. Nike continues to design and promote the Terra...'
 
     }
 ];
