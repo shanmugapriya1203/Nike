@@ -1,44 +1,50 @@
-import React, { useState, useEffect } from "react";
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
-import QRCode from "qrcode.react";
+import React, { useState, useEffect } from 'react';
+import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
+import QRCode from 'qrcode.react';
 
 const QrGenerator = () => {
-  const [data, setData] = useState("Example");
+  const [data, setData] = useState('Example');
   const [width, setWidth] = useState(150);
   const [height, setHeight] = useState(150);
-  const [color, setColor] = useState("#000000");
-  const [bgColor, setBgColor] = useState("#FFFFFF");
-  const [imageUrl, setImageUrl] = useState("");
-  const [imageFormat, setImageFormat] = useState("png");
+  const [color, setColor] = useState('#000000');
+  const [bgColor, setBgColor] = useState('#FFFFFF');
+  const [imageFormat, setImageFormat] = useState('png'); // Default format
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
 
   const handleGenerateQRCode = () => {
-    const url = `http://api.qrserver.com/v1/create-qr-code/?data=${data}&size=${width}x${height}&color=${color.replace(
-      "#",
-      ""
-    )}&bgcolor=${bgColor.replace("#", "")}&format=${imageFormat}`;
-    setImageUrl(url);
+    // Generate the QR code URL using qr.js
+    const qrCode = new QRCode({
+      content: data,
+      width: width,
+      height: height,
+      color: {
+        dark: color,
+        light: bgColor,
+      },
+    });
+
+    qrCode.toDataURL(`image/${imageFormat}`, (err, dataUrl) => {
+      if (err) {
+        console.error(err);
+      } else {
+        setQrCodeDataUrl(dataUrl);
+      }
+    });
   };
 
   const handleDownloadQRCode = () => {
-    fetch(imageUrl)
-      .then((response) => response.blob())
-      .then((blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `qrcode.${imageFormat}`;
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      });
+    // Trigger download of the QR code image
+    const a = document.createElement('a');
+    a.href = qrCodeDataUrl;
+    a.download = `qrcode.${imageFormat}`;
+    a.click();
   };
 
   useEffect(() => {
+    // This useEffect will generate the QR code URL initially when the component mounts
     handleGenerateQRCode();
   }, [imageFormat]);
 
@@ -109,7 +115,7 @@ const QrGenerator = () => {
           <Button
             variant="primary"
             size="sm"
-            className="my-2 mx-4 mb-3 mt-5"
+            className="my-2 mx-4 mb-3"
             onClick={handleGenerateQRCode}
           >
             Generate
@@ -117,16 +123,16 @@ const QrGenerator = () => {
           <Button
             variant="primary"
             size="sm"
-            className="my-2 mx-4 mb-3 mt-5"
+            className="my-2 mx-4 mb-3"
             onClick={handleDownloadQRCode}
           >
             Download
           </Button>
         </Form>
-        <div className="image">
-          {imageUrl && (
+        <div>
+          {qrCodeDataUrl && (
             <img
-              src={imageUrl}
+              src={qrCodeDataUrl}
               alt="QR Code"
               style={{ width: width, height: height }}
             />
