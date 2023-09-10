@@ -11,31 +11,38 @@ const QrGenerator = () => {
   const [height, setHeight] = useState(150);
   const [color, setColor] = useState("#000000");
   const [bgColor, setBgColor] = useState("#FFFFFF");
-  const [imageUrl, setImageUrl] = useState("");
   const [imageFormat, setImageFormat] = useState("png");
 
+  const [imageUrl, setImageUrl] = useState("");
+
   const handleGenerateQRCode = () => {
-    const url = `http://api.qrserver.com/v1/create-qr-code/?data=${data}&size=${width}x${height}&color=${color.replace(
-      "#",
-      ""
-    )}&bgcolor=${bgColor.replace("#", "")}&format=${imageFormat}`;
-    setImageUrl(url);
+    const qrOptions = {
+      width: width,
+      height: height,
+      color: {
+        dark: color,
+        light: bgColor,
+      },
+      type: imageFormat,
+    };
+
+    QRCode.toDataURL(data, qrOptions, (err, url) => {
+      if (err) {
+        console.error(err);
+      } else {
+        setImageUrl(url);
+      }
+    });
   };
 
   const handleDownloadQRCode = () => {
-    fetch(imageUrl)
-      .then((response) => response.blob())
-      .then((blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `qrcode.${imageFormat}`;
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      });
+    const a = document.createElement("a");
+    a.href = imageUrl;
+    a.download = `qrcode.${imageFormat}`;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   useEffect(() => {
@@ -57,7 +64,7 @@ const QrGenerator = () => {
             />
           </Form.Group>
           <Row>
-            <Col>
+            <Col xs={12} sm={6} md={4}>
               <Form.Group>
                 <Form.Label>Width</Form.Label>
                 <Form.Control
@@ -67,7 +74,7 @@ const QrGenerator = () => {
                 />
               </Form.Group>
             </Col>
-            <Col>
+            <Col xs={12} sm={6} md={4}>
               <Form.Group>
                 <Form.Label>Height</Form.Label>
                 <Form.Control
@@ -109,7 +116,7 @@ const QrGenerator = () => {
           <Button
             variant="primary"
             size="sm"
-            className="my-2 mx-4 mb-3 mt-5"
+            className="my-2 mx-4 mb-3 mt-3"
             onClick={handleGenerateQRCode}
           >
             Generate
@@ -117,7 +124,7 @@ const QrGenerator = () => {
           <Button
             variant="primary"
             size="sm"
-            className="my-2 mx-4 mb-3 mt-5"
+            className="my-2 mx-4 mb-3 mt-3"
             onClick={handleDownloadQRCode}
           >
             Download
@@ -125,10 +132,11 @@ const QrGenerator = () => {
         </Form>
         <div className="image">
           {imageUrl && (
-            <img
-              src={imageUrl}
-              alt="QR Code"
-              style={{ width: width, height: height }}
+            <QRCode
+              value={data}
+              size={width}
+              fgColor={color}
+              bgColor={bgColor}
             />
           )}
         </div>
