@@ -4,7 +4,7 @@ import image3 from '../assets/images/image3.jpg';
 
 export const navLinks = [
     { href: "#home", label: "Home" },
-    { href: "#about-us", label: "About Us" },
+    { href: "#about-us", label: "About " },
     { href: "#products", label: "Products" },
     { href: "#contact-us", label: "Contact Us" },
 ];
